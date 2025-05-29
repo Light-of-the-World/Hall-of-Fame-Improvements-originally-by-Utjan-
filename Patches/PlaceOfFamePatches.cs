@@ -22,7 +22,7 @@ namespace HallOfFameImprovements.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(PlaceOfFameBehaviour), nameof(PlaceOfFameBehaviour.method_14));
+            return AccessTools.Method(typeof(PlaceOfFameBehaviour), nameof(PlaceOfFameBehaviour.method_15));
         }
 
         [PatchPostfix]
@@ -31,24 +31,19 @@ namespace HallOfFameImprovements.Patches
             if (!Plugin.enabledPlugin.Value)
                 return;
 
-#if DEBUG
             Plugin.LogSource.LogWarning($"Calculating Hall of Fame bonus");
-#endif
 
-            GClass1431 gclass;
-            if ((gclass = (__instance.Data.CurrentStage.Bonuses.Data.FirstOrDefault(new Func<SkillBonusAbstractClass, bool>(PlaceOfFameBehaviour.Class1672.class1672_0.method_3)) as GClass1431)) != null)
+            GClass1598 gclass = __instance.Data.CurrentStage.Bonuses.Data.OfType<GClass1598>().FirstOrDefault<GClass1598>();
+            if (gclass != null)
             {
                 double levelingBonus = Traverse.Create(__instance).Field("double_0").GetValue<double>();
 
                 levelingBonus *= Plugin.bonusMultiplierDogtags.Value;
 
-#if DEBUG
                 Plugin.LogSource.LogWarning($"Bonus from dogtags {levelingBonus}");
-#endif
 
                 uniqueItemList = new List<string>();
-
-                LootItemClass lootItemClass = Traverse.Create(__instance).Field("lootItemClass").GetValue<LootItemClass>();
+                CompoundItem lootItemClass = Traverse.Create(__instance).Field("compoundItem_0").GetValue<CompoundItem>();
                 using (List<Item>.Enumerator enumerator = lootItemClass.GetAllItems().Where(new Func<Item, bool>(ItemIsNotDogtag)).ToList<Item>().GetEnumerator())
                 {
                     while (enumerator.MoveNext())
@@ -62,27 +57,34 @@ namespace HallOfFameImprovements.Patches
                         double FIRmult = enumerator.Current.MarkedAsSpawnedInSession ? Plugin.FIRmultiplier.Value : Plugin.nonFIRmultiplier.Value;
 
                         if (bonus > 0)
-                            bonus *= Plugin.bonusMultiplierNonDogtagItems.Value * FIRmult;
-
+                        { bonus *= Plugin.bonusMultiplierNonDogtagItems.Value * FIRmult; }
                         levelingBonus += bonus + uniqueBonus;
 
-#if DEBUG
                         Plugin.LogSource.LogWarning($"BONUS of {enumerator.Current.Name.Localized()} is {Math.Round(bonus, 3)} (unq {uniqueBonus}) and price {price} - FIR: {enumerator.Current.MarkedAsSpawnedInSession}");
-#endif
                     }
                 }
-
                 BonusController bonusController_0 = Traverse.Create(__instance).Field("bonusController_0").GetValue<BonusController>();
-
-                GClass1431 gclass2 = new GClass1431(Math.Round(levelingBonus, 1), gclass.BoostValue, gclass.Id, gclass.IsVisible, gclass.Icon);
+                /*
+                GClass1598 gclass4 = new GClass1598(gclass.ToDescriptor());//(Math.Round(levelingBonus, 1), gclass.BoostValue, gclass.Id, gclass.IsVisible, gclass.Icon);
+                gclass4.Value = (Math.Round(levelingBonus, 1));
+                gclass4.BoostValue = gclass.BoostValue;
+                gclass4.Id = gclass.Id;
                 bonusController_0.RemoveBonus(gclass, false);
                 __instance.Data.CurrentStage.Bonuses.Data.Remove(gclass);
-                __instance.Data.CurrentStage.Bonuses.Data.Add(gclass2);
-                bonusController_0.AddBonus(gclass2, false);
+                __instance.Data.CurrentStage.Bonuses.Data.Add(gclass4);
+                bonusController_0.AddBonus(gclass4, false);
+                */
 
-#if DEBUG
+                GClass1996 gclass2 = gclass.ToDescriptor();
+                gclass2.Value = (Math.Round(levelingBonus, 1));
+                GClass1598 gclass3 = new GClass1598(gclass2);
+                gclass3.BoostValue = gclass.BoostValue;
+                __instance.bonusController_0.RemoveBonus(gclass, false);
+                __instance.Data.CurrentStage.Bonuses.Data.Remove(gclass);
+                __instance.Data.CurrentStage.Bonuses.Data.Add(gclass3);
+                __instance.bonusController_0.AddBonus(gclass3, false);
+
                 Plugin.LogSource.LogWarning($"HALL OF FAME BONUS UPDATED: {levelingBonus}");
-#endif
             }
         }
         public static bool ItemIsNotDogtag(Item i)
@@ -132,7 +134,7 @@ namespace HallOfFameImprovements.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(PlaceOfFameBehaviour), nameof(PlaceOfFameBehaviour.method_12));
+            return AccessTools.Method(typeof(PlaceOfFameBehaviour), nameof(PlaceOfFameBehaviour.method_13));
         }
 
         [PatchPostfix]
@@ -145,9 +147,9 @@ namespace HallOfFameImprovements.Patches
             {
                 return;
             }
-            if (item.GetItemComponent<DogtagComponent>() == null && __instance.method_13(itemContainer))
+            if (item.GetItemComponent<DogtagComponent>() == null && __instance.method_14(itemContainer))
             {
-                __instance.method_14();
+                __instance.method_15();
             }
         }
     }

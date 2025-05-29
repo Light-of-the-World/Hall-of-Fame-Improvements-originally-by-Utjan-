@@ -21,7 +21,7 @@ using HallOfFameImprovements.Patches;
 
 namespace HallOfFameImprovements
 {
-    [BepInPlugin("com.utjan.HoFImprovements", "utjan.HoFImprovements", "1.2.0")]
+    [BepInPlugin("com.utjanandlight.HoFImprovements", "utjanandlight.HoFImprovements", "1.3.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource LogSource;
@@ -89,6 +89,8 @@ namespace HallOfFameImprovements
 
             new ApplyNonDogtagItemsPatch().Enable();
             new UpdateBonusOnItemSlottedPatch().Enable();
+
+            LogSource.LogInfo("(HOFI) Hall of Fame Improvements has loaded! Thank you to Utjan for originally making this.");
         }
     }
 }
