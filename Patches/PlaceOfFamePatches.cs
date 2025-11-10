@@ -33,7 +33,7 @@ namespace HallOfFameImprovements.Patches
 
             Plugin.LogSource.LogWarning($"Calculating Hall of Fame bonus");
 
-            GClass1598 gclass = __instance.Data.CurrentStage.Bonuses.Data.OfType<GClass1598>().FirstOrDefault<GClass1598>();
+            GClass1827 gclass = __instance.Data.CurrentStage.Bonuses.Data.OfType<GClass1827>().FirstOrDefault<GClass1827>();
             if (gclass != null)
             {
                 double levelingBonus = Traverse.Create(__instance).Field("double_0").GetValue<double>();
@@ -75,14 +75,14 @@ namespace HallOfFameImprovements.Patches
                 bonusController_0.AddBonus(gclass4, false);
                 */
 
-                GClass1996 gclass2 = gclass.ToDescriptor();
-                gclass2.Value = (Math.Round(levelingBonus, 1));
-                GClass1598 gclass3 = new GClass1598(gclass2);
-                gclass3.BoostValue = gclass.BoostValue;
-                __instance.bonusController_0.RemoveBonus(gclass, false);
+                ProfileBonusesClass profileBonusesClass = gclass.ToDescriptor();
+                profileBonusesClass.Value = Math.Round(__instance.Double_0, 1);
+                GClass1827 gclass2 = new GClass1827(profileBonusesClass);
+                gclass2.BoostValue = gclass.BoostValue;
+                __instance.BonusController_0.RemoveBonus(gclass, false);
                 __instance.Data.CurrentStage.Bonuses.Data.Remove(gclass);
-                __instance.Data.CurrentStage.Bonuses.Data.Add(gclass3);
-                __instance.bonusController_0.AddBonus(gclass3, false);
+                __instance.Data.CurrentStage.Bonuses.Data.Add(gclass2);
+                __instance.BonusController_0.AddBonus(gclass2, false);
 
                 Plugin.LogSource.LogWarning($"HALL OF FAME BONUS UPDATED: {levelingBonus}");
             }
