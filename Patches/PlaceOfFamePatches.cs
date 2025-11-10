@@ -40,17 +40,18 @@ namespace HallOfFameImprovements.Patches
 
                 levelingBonus *= Plugin.bonusMultiplierDogtags.Value;
 
-                Plugin.LogSource.LogWarning($"Bonus from dogtags {levelingBonus}");
+                Plugin.LogSource.LogInfo($"Bonus from dogtags {levelingBonus}");
 
                 uniqueItemList = new List<string>();
-                CompoundItem lootItemClass = Traverse.Create(__instance).Field("compoundItem_0").GetValue<CompoundItem>();
+                CompoundItem lootItemClass = Traverse.Create(__instance).Field("CompoundItem_0").GetValue<CompoundItem>();
                 using (List<Item>.Enumerator enumerator = lootItemClass.GetAllItems().Where(new Func<Item, bool>(ItemIsNotDogtag)).ToList<Item>().GetEnumerator())
                 {
                     while (enumerator.MoveNext())
                     {
                         float price = GetItemHandbookPrice(enumerator.Current);
                         if (price <= 0)
-                            continue;
+                        { Plugin.LogSource.LogWarning($"Price of item{enumerator.Current.Name} could not be found by GetItemHandbookPrice"); continue; }
+                            
 
                         double bonus = GetBuffBonusFromPrice(price);
                         double uniqueBonus = GetUniqueBonus(enumerator.Current);
@@ -58,9 +59,10 @@ namespace HallOfFameImprovements.Patches
 
                         if (bonus > 0)
                         { bonus *= Plugin.bonusMultiplierNonDogtagItems.Value * FIRmult; }
-                        levelingBonus += bonus + uniqueBonus;
+                        else Plugin.LogSource.LogInfo($"Bonus of item {enumerator.Current.Name} was 0!");
+                            levelingBonus += bonus + uniqueBonus;
 
-                        Plugin.LogSource.LogWarning($"BONUS of {enumerator.Current.Name.Localized()} is {Math.Round(bonus, 3)} (unq {uniqueBonus}) and price {price} - FIR: {enumerator.Current.MarkedAsSpawnedInSession}");
+                        Plugin.LogSource.LogInfo($"BONUS of {enumerator.Current.Name.Localized()} is {Math.Round(bonus, 3)} (unq {uniqueBonus}) and price {price} - FIR: {enumerator.Current.MarkedAsSpawnedInSession}");
                     }
                 }
                 BonusController bonusController_0 = Traverse.Create(__instance).Field("bonusController_0").GetValue<BonusController>();
