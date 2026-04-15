@@ -21,7 +21,7 @@ using HallOfFameImprovements.Patches;
 
 namespace HallOfFameImprovements
 {
-    [BepInPlugin("com.utjanandlight.HoFImprovements", "utjanandlight.HoFImprovements", "2.0.0")]
+    [BepInPlugin("com.utjanandlight.HoFImprovements", "utjanandlight.HoFImprovements", "2.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource LogSource;

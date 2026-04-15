@@ -36,7 +36,7 @@ namespace HallOfFameImprovements.Patches
             GClass1827 gclass = __instance.Data.CurrentStage.Bonuses.Data.OfType<GClass1827>().FirstOrDefault<GClass1827>();
             if (gclass != null)
             {
-                double levelingBonus = Traverse.Create(__instance).Field("double_0").GetValue<double>();
+                double levelingBonus = gclass.Value;
 
                 levelingBonus *= Plugin.bonusMultiplierDogtags.Value;
 
@@ -65,7 +65,7 @@ namespace HallOfFameImprovements.Patches
                         Plugin.LogSource.LogInfo($"BONUS of {enumerator.Current.Name.Localized()} is {Math.Round(bonus, 3)} (unq {uniqueBonus}) and price {price} - FIR: {enumerator.Current.MarkedAsSpawnedInSession}");
                     }
                 }
-                BonusController bonusController_0 = Traverse.Create(__instance).Field("bonusController_0").GetValue<BonusController>();
+                BonusController bonusController_0 = Traverse.Create(__instance).Field("BonusController_0").GetValue<BonusController>();
                 /*
                 GClass1598 gclass4 = new GClass1598(gclass.ToDescriptor());//(Math.Round(levelingBonus, 1), gclass.BoostValue, gclass.Id, gclass.IsVisible, gclass.Icon);
                 gclass4.Value = (Math.Round(levelingBonus, 1));
@@ -79,14 +79,22 @@ namespace HallOfFameImprovements.Patches
 
                 ProfileBonusesClass profileBonusesClass = gclass.ToDescriptor();
                 profileBonusesClass.Value = Math.Round(__instance.Double_0, 1);
+                //Plugin.LogSource.LogInfo($"TEST: Old value is {__instance.Double_0}");
+                levelingBonus = Math.Round(levelingBonus, 1);
+                //Plugin.LogSource.LogInfo($"TEST: New value is {levelingBonus}. Is this different from the old bonus?");
                 GClass1827 gclass2 = new GClass1827(profileBonusesClass);
                 gclass2.BoostValue = gclass.BoostValue;
+
+                gclass2.Value = levelingBonus;
+                //Plugin.LogSource.LogInfo($"TEST: Boost Value is {gclass2.BoostValue}");
                 __instance.BonusController_0.RemoveBonus(gclass, false);
                 __instance.Data.CurrentStage.Bonuses.Data.Remove(gclass);
                 __instance.Data.CurrentStage.Bonuses.Data.Add(gclass2);
                 __instance.BonusController_0.AddBonus(gclass2, false);
 
-                Plugin.LogSource.LogWarning($"HALL OF FAME BONUS UPDATED: {levelingBonus}");
+                Plugin.LogSource.LogWarning($"HALL OF FAME BONUS UPDATED: {levelingBonus * (1 + (__instance.SkillManager_0.HideoutManagement.Level/100))}. This includes the Hideout Management's effects on the skill. This number is slightly innacurate for some reason, please see your in game HOF for true value.");
+                //Plugin.LogSource.LogInfo($"TEST: {__instance.SkillManager_0.HideoutManagement.Level}");
+                //Second half of the formula accounts for Hideout Management skill
             }
         }
         public static bool ItemIsNotDogtag(Item i)
